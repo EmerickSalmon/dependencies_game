@@ -37,5 +37,7 @@ class Licence(BaseModel):
     expiration_date = Column(DateTime, nullable=False)
 
     def check_status(self):
-        if self.expiration_date < datetime.now(timezone.utc).replace(tzinfo=None):
-            self.isHealthy = False
+        # Uncomment the following line to enable expiration check
+        # if self.expiration_date < datetime.now(timezone.utc).replace(tzinfo=None):
+        #     self.isHealthy = False
+        pass

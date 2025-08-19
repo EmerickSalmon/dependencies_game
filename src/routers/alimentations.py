@@ -42,6 +42,5 @@ async def update_alimentation_status(alimentation_id: int, status: bool, backgro
     db_alimentation.isHealthy = status
     db.commit()
     db.refresh(db_alimentation)
-    if not status:
-        background_tasks.add_task(crud.update_robots_health_status, db)
+    background_tasks.add_task(crud.update_robots_health_status, db)
     return db_alimentation

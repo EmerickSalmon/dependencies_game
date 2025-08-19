@@ -42,6 +42,5 @@ async def update_guidage_status(guidage_id: int, status: bool, background_tasks:
     db_guidage.isHealthy = status
     db.commit()
     db.refresh(db_guidage)
-    if not status:
-        background_tasks.add_task(crud.update_robots_health_status, db)
+    background_tasks.add_task(crud.update_robots_health_status, db)
     return db_guidage

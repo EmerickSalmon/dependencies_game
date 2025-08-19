@@ -146,5 +146,17 @@ def update_robots_health_status(db: Session):
             robot.isHealthy = False
             db.commit()
             db.refresh(robot)
+    
+    unhealthy_robots = db.query(models.Robot).filter(models.Robot.isHealthy == False).all()
+    print(f"Unhealthy robots found: {len(unhealthy_robots)}")
+    for robot in unhealthy_robots:
+        alimentation = db.query(models.Alimentation).filter(models.Alimentation.id == robot.alimentation_id).first()
+        guidage = db.query(models.Guidage).filter(models.Guidage.id == robot.guidage_id).first()
+        licence = db.query(models.Licence).filter(models.Licence.id == robot.licence_id).first()
+        if alimentation and alimentation.isHealthy and guidage and guidage.isHealthy and licence and licence.isHealthy:
+            robot.isHealthy = True
+            db.commit()
+            db.refresh(robot)
+    # return {"message": "Unhealthy robots updated if all related objects are healthy."}
 
     return {"message": "Robots health status updated based on related objects"}
