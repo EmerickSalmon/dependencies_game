@@ -96,6 +96,22 @@ def update_licence_status(db: Session, licence_id: int, status: bool):
         db.refresh(db_licence)
     return db_licence
 
+def update_licences_health_status(db: Session):
+    logger.info("Updating all licences health status based on expiration dates")
+    licences = db.query(models.Licence).all()
+    updated_count = 0
+    
+    for licence in licences:
+        original_status = licence.isHealthy
+        licence.check_status()
+        if licence.isHealthy != original_status:
+            updated_count += 1
+            db.commit()
+            db.refresh(licence)
+    
+    logger.info(f"Updated {updated_count} licence(s) health status based on expiration")
+    return {"message": f"Updated {updated_count} licence(s) health status based on expiration"}
+
 def update_robot_status(db: Session, robot_id: int, status: bool):
     logger.info(f"Updating robot status for ID {robot_id} to {status}")
     db_robot = get_robot(db, robot_id)
@@ -116,6 +132,10 @@ def update_robot_status(db: Session, robot_id: int, status: bool):
 
 def update_robots_health_status(db: Session):
     logger.info("Updating robots health status based on related objects")
+    
+    # First, update all licences based on expiration dates
+    update_licences_health_status(db)
+    
     # Get all unhealthy alimentations
     unhealthy_alimentations = db.query(models.Alimentation).filter(models.Alimentation.isHealthy == False).all()
     # Get all unhealthy guidages
