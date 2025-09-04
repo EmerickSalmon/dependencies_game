@@ -123,7 +123,7 @@ class TestLicenseExpiration:
         db_session.refresh(expired_license)
         
         # Create related objects
-        alimentation = models.Alimentation(alimentationType=models.AlimentationType.SOLAIRE, isHealthy=True)
+        alimentation = models.Alimentation(alimentationType=models.AlimentationType.SOLAIRE, isHealthy=True, capacity=100)
         guidage = models.Guidage(isHealthy=True)
         db_session.add(alimentation)
         db_session.add(guidage)
@@ -137,7 +137,8 @@ class TestLicenseExpiration:
             isHealthy=True,
             alimentation_id=alimentation.id,
             guidage_id=guidage.id,
-            licence_id=expired_license.id
+            licence_id=expired_license.id,
+            motor=models.MotorType.PETIT
         )
         db_session.add(robot)
         db_session.commit()

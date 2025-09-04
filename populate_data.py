@@ -22,22 +22,24 @@ def create_guidage():
     response.raise_for_status()
     return response.json()
 
-def create_alimentation(type):
+def create_alimentation(type, capacity):
     alimentation_data = {
         "alimentationType": type,
-        "isHealthy": True
+        "isHealthy": True,
+        "capacity": capacity
     }
     response = requests.post(f"{BASE_URL}/alimentations/", json=alimentation_data)
     response.raise_for_status()
     return response.json()
 
-def create_robot(name, alimentation_id, guidage_id, licence_id):
+def create_robot(name, alimentation_id, guidage_id, licence_id, motor):
     robot_data = {
         "name": name,
         "isHealthy": True,
         "alimentation_id": alimentation_id,
         "guidage_id": guidage_id,
         "licence_id": licence_id,
+        "motor": motor
     }
     response = requests.post(f"{BASE_URL}/robots/", json=robot_data)
     response.raise_for_status()
@@ -58,18 +60,20 @@ def main():
     print("Creating alimentations...")
     alimentations = []
     for _ in range(50):
-        alimentations.append(create_alimentation("SOLAIRE"))
-        alimentations.append(create_alimentation("NUCLEAIRE"))
+        alimentations.append(create_alimentation("SOLAIRE", 50))
+        alimentations.append(create_alimentation("NUCLEAIRE", 100))
     print(f"Created {len(alimentations)} alimentations.")
 
     # Create robots
     print("Creating robots...")
+    motor_types = ["PETIT", "MOYEN", "GRAND"]
     for i in range(100):
         name = f"Robot_{i+1}"
         alimentation = random.choice(alimentations)
         guidage = guidages[i % len(guidages)]
         licence = licences[i % len(licences)]
-        create_robot(name, alimentation["id"], guidage["id"], licence["id"])
+        motor = random.choice(motor_types)
+        create_robot(name, alimentation["id"], guidage["id"], licence["id"], motor)
     print("Created 100 robots.")
 
 if __name__ == "__main__":

@@ -112,6 +112,34 @@ def update_licences_health_status(db: Session):
     logger.info(f"Updated {updated_count} licence(s) health status based on expiration")
     return {"message": f"Updated {updated_count} licence(s) health status based on expiration"}
 
+def update_power_health_status(db: Session):
+    logger.info("Checking power status for all alimentations.")
+    alimentations = db.query(models.Alimentation).all()
+    for alim in alimentations:
+        if not alim.isHealthy:
+            continue
+
+        connected_robots = db.query(models.Robot).filter(models.Robot.alimentation_id == alim.id).all()
+
+        healthy_robots = [r for r in connected_robots if r.isHealthy]
+
+        current_load = sum(r.power_consumption for r in healthy_robots)
+
+        if current_load > alim.capacity:
+            logger.warning(f"Alimentation {alim.id} is overloaded! Capacity: {alim.capacity}, Load: {current_load}")
+
+            sorted_robots_to_turn_off = sorted(healthy_robots, key=lambda r: (r.power_consumption, r.id), reverse=True)
+
+            for robot in sorted_robots_to_turn_off:
+                if current_load <= alim.capacity:
+                    break
+
+                robot.isHealthy = False
+                current_load -= robot.power_consumption
+                db.commit()
+                db.refresh(robot)
+                logger.info(f"Robot {robot.id} turned off on alimentation {alim.id} to reduce load.")
+
 def update_robot_status(db: Session, robot_id: int, status: bool):
     logger.info(f"Updating robot status for ID {robot_id} to {status}")
     db_robot = get_robot(db, robot_id)
@@ -177,6 +205,8 @@ def update_robots_health_status(db: Session):
             robot.isHealthy = True
             db.commit()
             db.refresh(robot)
+
+    update_power_health_status(db)
     # return {"message": "Unhealthy robots updated if all related objects are healthy."}
 
     return {"message": "Robots health status updated based on related objects"}

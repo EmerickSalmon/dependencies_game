@@ -12,6 +12,11 @@ class AlimentationType(enum.Enum):
     SOLAIRE = "SOLAIRE"
     NUCLEAIRE = "NUCLEAIRE"
 
+class MotorType(enum.Enum):
+    PETIT = "PETIT"
+    MOYEN = "MOYEN"
+    GRAND = "GRAND"
+
 class Robot(BaseModel):
     __tablename__ = "robots"
 
@@ -19,6 +24,16 @@ class Robot(BaseModel):
     alimentation_id = Column(Integer)
     guidage_id = Column(Integer)
     licence_id = Column(Integer)
+    motor = Column(Enum(MotorType), nullable=False)
+
+    @property
+    def power_consumption(self):
+        motor_consumption = {
+            MotorType.PETIT: 10,
+            MotorType.MOYEN: 20,
+            MotorType.GRAND: 30,
+        }
+        return motor_consumption.get(self.motor, 0)
 
     def __str__(self):
         return f"{self.name} id: {self.id}"
@@ -27,6 +42,7 @@ class Alimentation(BaseModel):
     __tablename__ = "alimentations"
 
     alimentationType = Column(Enum(AlimentationType), nullable=False)
+    capacity = Column(Integer, nullable=False)
 
 class Guidage(BaseModel):
     __tablename__ = "guidages"
