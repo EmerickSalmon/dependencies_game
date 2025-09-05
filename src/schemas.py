@@ -6,12 +6,18 @@ class AlimentationType(str, Enum):
     solaire = "SOLAIRE"
     nucleaire = "NUCLEAIRE"
 
+class MotorType(str, Enum):
+    petit = "PETIT"
+    moyen = "MOYEN"
+    grand = "GRAND"
+
 class RobotBase(BaseModel):
     name: str
     isHealthy: bool
     alimentation_id: int
     guidage_id: int
     licence_id: int
+    motor: MotorType
 
 class RobotCreate(RobotBase):
     pass
@@ -25,6 +31,7 @@ class Robot(RobotBase):
 class AlimentationBase(BaseModel):
     alimentationType: AlimentationType
     isHealthy: bool
+    capacity: int
 
 class AlimentationCreate(AlimentationBase):
     pass
