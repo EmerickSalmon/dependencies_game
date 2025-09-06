@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from enum import Enum
 from datetime import datetime
+from typing import List
 
 class AlimentationType(str, Enum):
     solaire = "SOLAIRE"
@@ -29,6 +30,10 @@ class Robot(RobotBase):
 
     class Config:
         from_attributes = True
+
+class RobotsResponse(BaseModel):
+    total_count: int
+    robots: List[Robot]
 
 class AlimentationBase(BaseModel):
     alimentationType: AlimentationType

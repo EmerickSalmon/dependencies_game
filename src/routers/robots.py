@@ -28,7 +28,7 @@ def read_robot(robot_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Robot not found")
     return db_robot
 
-@router.get("/", response_model=List[schemas.Robot])
+@router.get("/", response_model=schemas.RobotsResponse)
 def read_robots(
     skip: int = 0,
     limit: int = 10,
@@ -49,8 +49,10 @@ def read_robots(
     if licence_id is not None:
         query = query.filter(models.Robot.licence_id == licence_id)
 
+    total_count = query.count()
     robots = query.offset(skip).limit(limit).all()
-    return robots
+
+    return {"total_count": total_count, "robots": robots}
 
 @router.put("/{robot_id}/status", response_model=schemas.Robot)
 async def update_robot_status(robot_id: int, status: bool, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
