@@ -24,6 +24,8 @@ class RobotCreate(RobotBase):
 
 class Robot(RobotBase):
     id: int
+    # Ajout de la consommation du moteur du robot
+    consumption: int
 
     class Config:
         from_attributes = True
