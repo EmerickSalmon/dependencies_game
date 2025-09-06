@@ -27,7 +27,11 @@ class Robot(BaseModel):
     motor = Column(Enum(MotorType), nullable=False)
 
     @property
-    def power_consumption(self):
+    def consumption(self):
+        """
+        Calcule la consommation d'énergie du robot en fonction de son type de moteur.
+        Cette propriété est utilisée pour exposer la consommation dans l'API.
+        """
         motor_consumption = {
             MotorType.PETIT: 10,
             MotorType.MOYEN: 20,
