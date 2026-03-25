@@ -102,6 +102,29 @@ Dependencies_game/
 - The health status of licenses is automatically checked based on the expiration date.
 - The health status of licenses can be updated, and if set to `False`, it will trigger an update to the health status of related robots.
 
+## Gestion de l'énergie
+
+L'API inclut désormais des fonctionnalités de gestion de l'énergie pour surveiller et contrôler la consommation d'énergie des robots et la capacité des alimentations.
+
+### Consommation d'énergie des robots
+
+Chaque robot consomme de l'énergie en fonction de son type de moteur :
+- **PETIT** : 10 unités
+- **MOYEN** : 20 unités
+- **GRAND** : 30 unités
+
+Cette consommation est calculée via la propriété `power_consumption` sur le modèle Robot.
+
+### Capacité de l'alimentation et gestion de la charge
+
+Chaque alimentation (`Alimentation`) a une `capacité` qui définit la puissance maximale qu'elle peut fournir. Le système vérifie périodiquement si la puissance totale consommée par tous les robots sains connectés à une alimentation dépasse sa capacité.
+
+Si une alimentation est surchargée, le système éteint automatiquement les robots pour réduire la charge. Les robots sont désactivés dans l'ordre de priorité suivant :
+1. Les robots ayant la plus grande consommation d'énergie sont éteints en premier.
+2. En cas d'égalité de consommation d'énergie, le robot avec l'ID le plus élevé est éteint en premier.
+
+Cette logique est gérée par la fonction `update_power_health_status`, qui est appelée dans `update_robots_health_status`.
+
 ## License
 
 This project is licensed under the MIT License.
